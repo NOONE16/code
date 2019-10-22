@@ -1,11 +1,16 @@
 poly
 string
 sll
-seq
+seq#
 dll
+employee
+quick sort
+set
+gll
 
 
 sll
+
 
 #include<stdio.h>
 #include<malloc.h>
@@ -926,7 +931,7 @@ return(pow1);
  }
 
 
-employee
+employee seq database
 
 #include<stdio.h>
 #include<string.h>
@@ -1153,6 +1158,781 @@ return 0;
 }
 }
   
+
+qiuck sort:
+
+
+ #include<stdio.h>
+
+void quicksort(int a[10],int first,int last);
+
+void main()
+{
+  int a[20],n,i;
+
+  printf("Enter size of the array: ");
+  scanf("%d",&n);
+
+  printf("Enter %d elements: ",n);
+  for(i=0;i<n;i++)
+    scanf("%d",&a[i]);
+
+  quicksort(a,0,n-1);
+
+  printf("Sorted elements: ");
+  for(i=0;i<n;i++)
+    printf(" %d",a[i]);
+
+}
+
+void quicksort(int a[10],int first,int last)
+{
+    int pivot,j,temp,i;
+
+     if(first<last)
+     {
+         pivot=first;
+         i=first;
+         j=last;
+
+         while(i<j)
+         {
+             while(a[i]<=a[pivot]&&i<last)
+                 i++;
+             while(a[j]>a[pivot])
+                 j--;
+             if(i<j)
+             {
+                 temp=a[i];
+                  a[i]=a[j];
+                  a[j]=temp;
+             }
+         }
+
+         temp=a[pivot];
+         a[pivot]=a[j];
+         a[j]=temp;
+
+         quicksort(a,first,j-1);
+         quicksort(a,j+1,last);
+
+    }
+}
+
+
+
+
+set
+
+#include<stdio.h>
+void union1(int set1[20],int set2[20],int m,int n);
+void intersection(int set1[20],int set2[20],int m,int n);
+void difference(int set1[20],int set2[20],int m,int n);
+void symm_difference(int set1[20],int set2[20],int m,int n);
+
+
+void main()
+{
+ int s1[20],s2[20], size1,size2,i,ch;
+ printf("\n How many elements in first set");
+ scanf("%d",&size1);
+ printf("\n Enter %d elements of first set",size1);
+ for(i=0;i<size1;i++)
+  {
+    scanf("%d",&s1[i]);
+  }
+ printf("\n How any elements in Second set");
+ scanf("%d",&size2);
+ printf("\n Enter %d elements of second set",size2);
+ for(i=0;i<size2;i++)
+  {
+    scanf("%d",&s2[i]);
+  }
+
+ printf("\n1.UNION\n2.INTERSECTION\n3.DIFFERENCE\n4.SYMMETRIC DIFFERENCE\n");
+ printf("\n Enter ur Choice");
+ scanf("%d",&ch);
+ switch(ch)
+ {
+   case 1: union1(s1,s2,size1,size2);
+           break;
+   case 2: intersection(s1,s2,size1,size2);
+           break;
+   case 3: difference(s1,s2,size1,size2);
+           break;
+   case 4: symm_difference(s1,s2,size1,size2);
+           break;
+ }
+}
+
+// Function for union of two sets
+
+void union1(int set1[20],int set2[20],int m,int n)
+{
+ int i,j,k,flag;
+ int set3[40];
+ for(i=0;i<m;i++)
+  {
+    set3[i]=set1[i];
+  }
+  //size of set3 is size of set1
+k=m;
+for(i=0;i<n;i++)
+{
+    flag=0;
+    for(j=0;j<k;j++)
+      {
+       if(set2[i]==set3[j])
+         {
+          flag=1;
+          break;
+         }
+      }
+     if(flag==0)
+      {
+       set3[k]=set2[i];
+       k++;
+      }
+}  
+printf("\n first set= ");
+for(i=0;i<m;i++)
+ {
+   printf("%d ",set1[i]);
+ }
+printf("\n second set= ");
+for(i=0;i<n;i++)
+ {
+   printf("%d ",set2[i]);
+ }
+
+printf("\n Union of two set= ");
+for(i=0;i<k;i++)
+ {
+   printf("%d ",set3[i]);
+ }
+printf("\n\n");
+}
+
+// Function for interserction
+
+void intersection(int set1[20],int set2[20],int m,int n)
+{
+int i,j,k,flag;
+ int set3[20];
+ k=0;
+for(i=0;i<m;i++)
+{
+    flag=0;
+    for(j=0;j<n;j++)
+      {
+       if(set1[i]==set2[j])
+         {
+          flag=1;
+          break;
+         }
+      }
+     if(flag==1)
+      {
+       set3[k]=set1[i];
+       k++;
+      }
+}  
+printf("\n first set= ");
+for(i=0;i<m;i++)
+ {
+   printf("%d ",set1[i]);
+ }
+printf("\n second set= ");
+for(i=0;i<n;i++)
+ {
+   printf("%d ",set2[i]);
+ }
+
+printf("\nIntersection set= ");
+for(i=0;i<k;i++)
+ {
+   printf("%d ",set3[i]);
+ }
+printf("\n\n");
+}
+// Function for difference
+void difference(int set1[20],int set2[20],int m,int n)
+{
+ int i,j,k,flag;
+ int set3[20];
+ k=0;
+for(i=0;i<m;i++)
+{
+    flag=0;
+    for(j=0;j<n;j++)
+      {
+       if(set1[i]==set2[j])
+         {
+          flag=1;
+          break;
+         }
+      }
+     if(flag==0)
+      {
+       set3[k]=set1[i];
+       k++;
+      }
+}  
+printf("\n first set= ");
+for(i=0;i<m;i++)
+ {
+   printf("%d ",set1[i]);
+ }
+printf("\n second set= ");
+for(i=0;i<n;i++)
+ {
+   printf("%d ",set2[i]);
+ }
+
+printf("\nDifference of two set= ");
+for(i=0;i<k;i++)
+ {
+   printf("%d ",set3[i]);
+ }
+printf("\n\n");
+}
+
+// Function for Symm-difference
+void symm_difference(int set1[20],int set2[20],int m,int n)
+{
+ int i,j,k,flag;
+ int set3[20];
+ k=0; //position
+for(i=0;i<m;i++) 
+{
+    flag=0;
+    for(j=0;j<n;j++)
+      {
+if(set1[i]==set2[j]) // calculate set1-set2
+         {
+          flag=1;
+          break;
+         }
+      }
+     if(flag==0)
+      {
+    set3[k]=set1[i]; //insert and increment number of element..
+       k++;
+      }
+}  
+for(i=0;i<n;i++)   
+{
+    flag=0;
+    for(j=0;j<m;j++)
+      {
+  if(set2[i]==set1[j]) //calculate set2-set1
+
+         {
+          flag=1;
+          break;
+         }
+      }
+     if(flag==0)
+      {
+    set3[k]=set2[i]; //insert and increment number of elements
+       k++;
+      }
+}  
+
+printf("\n first set= ");
+for(i=0;i<m;i++)
+ {
+   printf("%d ",set1[i]);
+ }
+printf("\n second set= ");
+for(i=0;i<n;i++)
+ {
+   printf("%d ",set2[i]);
+ }
+
+printf("\nDifference of two set= ");
+for(i=0;i<k;i++)
+ {
+   printf("%d ",set3[i]);
+ }
+printf("\n\n");
+}
+
+
+set op
+
+
+#include<stdio.h>
+void union1(int set1[20],int set2[20],int m,int n);
+void intersection(int set1[20],int set2[20],int m,int n);
+void difference(int set1[20],int set2[20],int m,int n);
+void symm_difference(int set1[20],int set2[20],int m,int n);
+
+
+void main()
+{
+ int s1[20],s2[20], size1,size2,i,ch;
+ printf("\n How many elements in first set");
+ scanf("%d",&size1);
+ printf("\n Enter %d elements of first set",size1);
+ for(i=0;i<size1;i++)
+  {
+    scanf("%d",&s1[i]);
+  }
+ printf("\n How any elements in Second set");
+ scanf("%d",&size2);
+ printf("\n Enter %d elements of second set",size2);
+ for(i=0;i<size2;i++)
+  {
+    scanf("%d",&s2[i]);
+  }
+
+ printf("\n1.UNION\n2.INTERSECTION\n3.DIFFERENCE\n4.SYMMETRIC DIFFERENCE\n");
+ printf("\n Enter ur Choice");
+ scanf("%d",&ch);
+ switch(ch)
+ {
+   case 1: union1(s1,s2,size1,size2);
+           break;
+   case 2: intersection(s1,s2,size1,size2);
+           break;
+   case 3: difference(s1,s2,size1,size2);
+           break;
+   case 4: symm_difference(s1,s2,size1,size2);
+           break;
+ }
+}
+
+// Function for union of two sets
+
+void union1(int set1[20],int set2[20],int m,int n)
+{
+ int i,j,k,flag;
+ int set3[40];
+ for(i=0;i<m;i++)
+  {
+    set3[i]=set1[i];
+  }
+  //size of set3 is size of set1
+k=m;
+for(i=0;i<n;i++)
+{
+    flag=0;
+    for(j=0;j<k;j++)
+      {
+       if(set2[i]==set3[j])
+         {
+          flag=1;
+          break;
+         }
+      }
+     if(flag==0)
+      {
+       set3[k]=set2[i];
+       k++;
+      }
+}  
+printf("\n first set= ");
+for(i=0;i<m;i++)
+ {
+   printf("%d ",set1[i]);
+ }
+printf("\n second set= ");
+for(i=0;i<n;i++)
+ {
+   printf("%d ",set2[i]);
+ }
+
+printf("\n Union of two set= ");
+for(i=0;i<k;i++)
+ {
+   printf("%d ",set3[i]);
+ }
+printf("\n\n");
+}
+
+// Function for interserction
+
+void intersection(int set1[20],int set2[20],int m,int n)
+{
+int i,j,k,flag;
+ int set3[20];
+ k=0;
+for(i=0;i<m;i++)
+{
+    flag=0;
+    for(j=0;j<n;j++)
+      {
+       if(set1[i]==set2[j])
+         {
+          flag=1;
+          break;
+         }
+      }
+     if(flag==1)
+      {
+       set3[k]=set1[i];
+       k++;
+      }
+}  
+printf("\n first set= ");
+for(i=0;i<m;i++)
+ {
+   printf("%d ",set1[i]);
+ }
+printf("\n second set= ");
+for(i=0;i<n;i++)
+ {
+   printf("%d ",set2[i]);
+ }
+
+printf("\nIntersection set= ");
+for(i=0;i<k;i++)
+ {
+   printf("%d ",set3[i]);
+ }
+printf("\n\n");
+}
+// Function for difference
+void difference(int set1[20],int set2[20],int m,int n)
+{
+ int i,j,k,flag;
+ int set3[20];
+ k=0;
+for(i=0;i<m;i++)
+{
+    flag=0;
+    for(j=0;j<n;j++)
+      {
+       if(set1[i]==set2[j])
+         {
+          flag=1;
+          break;
+         }
+      }
+     if(flag==0)
+      {
+       set3[k]=set1[i];
+       k++;
+      }
+}  
+printf("\n first set= ");
+for(i=0;i<m;i++)
+ {
+   printf("%d ",set1[i]);
+ }
+printf("\n second set= ");
+for(i=0;i<n;i++)
+ {
+   printf("%d ",set2[i]);
+ }
+
+printf("\nDifference of two set= ");
+for(i=0;i<k;i++)
+ {
+   printf("%d ",set3[i]);
+ }
+printf("\n\n");
+}
+
+// Function for Symm-difference
+void symm_difference(int set1[20],int set2[20],int m,int n)
+{
+ int i,j,k,flag;
+ int set3[20];
+ k=0; //position
+for(i=0;i<m;i++) 
+{
+    flag=0;
+    for(j=0;j<n;j++)
+      {
+if(set1[i]==set2[j]) // calculate set1-set2
+         {
+          flag=1;
+          break;
+         }
+      }
+     if(flag==0)
+      {
+    set3[k]=set1[i]; //insert and increment number of element..
+       k++;
+      }
+}  
+for(i=0;i<n;i++)   
+{
+    flag=0;
+    for(j=0;j<m;j++)
+      {
+  if(set2[i]==set1[j]) //calculate set2-set1
+
+         {
+          flag=1;
+          break;
+         }
+      }
+     if(flag==0)
+      {
+    set3[k]=set2[i]; //insert and increment number of elements
+       k++;
+      }
+}  
+
+printf("\n first set= ");
+for(i=0;i<m;i++)
+ {
+   printf("%d ",set1[i]);
+ }
+printf("\n second set= ");
+for(i=0;i<n;i++)
+ {
+   printf("%d ",set2[i]);
+ }
+
+printf("\nDifference of two set= ");
+for(i=0;i<k;i++)
+ {
+   printf("%d ",set3[i]);
+ }
+printf("\n\n");
+}
+
+selection sort
+bubble sort:
+
+#include<stdio.h>
+#include<string.h>
+void bubble(char str[10][15],int n);
+void selection(char str[10][15],int n);
+void main()
+{
+ char str[10][15];
+int n,i,ch;
+do
+{
+  printf("\n\n*******String Sorting *************");
+ printf("\n1. Bubble sorting\n2. Selection sorting\n3. Exit");
+ printf("\n\n***********************************");
+ printf("\n ENTER UR CHOICE");
+ scanf("%d",&ch);
+
+ switch(ch)
+{
+ case 1:printf("\n\nHow many number of strings in array");
+        scanf("%d",&n);
+        printf("\n Enter %d strings",n);
+        for(i=0;i<n;i++)
+        scanf("%s",str[i]);
+        bubble(str,n);
+        break;
+ case 2:printf("\n\nHow many number of strings in array");
+        scanf("%d",&n);
+        printf("\n Enter %d strings",n);
+        for(i=0;i<n;i++)
+        scanf("%s",str[i]);
+        selection(str,n);
+        break;
+}
+}while(ch!=3);
+
+}
+
+
+void bubble(char str[10][15],int n)
+{
+ int i,j,k;
+ char temp[15];
+ printf("\n Bubble sorting : \n");
+ for(k=0;k<n;k++)      // Display strings before sorting 
+ printf("\t%s",str[k]);
+ 
+for(i=0;i<n;i++)
+  {
+    for(j=0;j<n-1;j++)
+    {
+      if(strcmp(str[j],str[j+1])>0)
+        {
+          strcpy(temp,str[j]);
+          strcpy(str[j],str[j+1]);
+          strcpy(str[j+1],temp);
+          printf("\n");
+          for(k=0;k<n;k++)  // Display strings after interchanging 
+          printf("\t%s",str[k]);
+        }
+    }
+  }
+
+}
+
+
+void selection(char str[10][15],int n)
+{
+ int i,j,k;
+ char temp[15];
+ printf("\n selection sorting : \n");
+ for(k=0;k<n;k++)      // Display strings before sorting 
+ printf("\t%s",str[k]);
+ 
+for(i=0;i<n;i++)
+  {
+    for(j=i+1;j<n;j++)
+    {
+      if(strcmp(str[i],str[j])<0)
+        {
+          strcpy(temp,str[i]);
+          strcpy(str[i],str[j]);
+          strcpy(str[j],temp);
+          printf("\n");
+          for(k=0;k<n;k++)  // Display strings after interchanging 
+          printf("\t%s",str[k]);
+        }
+    }
+  }
+}
+
+
+
+
+gll
+
+
+
+
+/*
+ Represent a Generalised linked list.
+*/
+#include<malloc.h>
+typedef struct gllnode
+   {
+	int flag;
+	char c;
+	struct gllnode *next,*dptr;   
+   }node;
+
+ node* create(char *a);
+ void display(node *p);
+
+ void main()
+ {
+	char a[20];
+	int ch,choice;
+	node *head;
+	head=NULL;
+	
+     do
+      {
+	printf("\n***********GENERALISED LINKED LIST***********");
+	printf("\n1.Create GLL\n2.Display GLL");
+	printf("\n Enter your choice:\n");
+	scanf("%d",&ch);	
+       switch(ch)
+         {
+	 case 1:
+		printf("\n Enter GLL:\n");
+		scanf("%s",a);
+		head=create(a);
+		printf("\n GLL Created Successfully....");
+		break;
+	 case 2:
+		printf("\n GLL is:\n");
+		display(head);
+		break;
+	 }
+	printf("\n Do you want to continue(1/0):");
+        scanf("%d",&choice);
+      }while(choice==1);
+    
+ }
+
+ node* create(char *a)
+  {
+    static int i;
+    node *p;
+     	if(a[i]=='\0')
+	return(NULL);
+	for(;a[i]=='('||a[i]==',';i++)
+	p=(node*)malloc(sizeof(node));
+	if(a[i]=='(')
+	{
+	  p->flag=1;
+	  p->c=a[i];
+	  p->next=NULL;
+	  i++;
+	  p->dptr=create(a);
+	  if(a[i]!='\0')
+	  p->next=create(a);
+	  else
+	  i=0;
+	}
+	else if(a[i]!=')'&& a[i]!=',')
+	{
+	  p->flag=0;
+	  p->c=a[i];
+	  p->dptr=NULL;
+	  i++;
+	  p->next=create(a);
+   	}
+	else if(a[i]==')')
+	{
+	  i++;
+	  free(p);
+	  return(NULL);
+	}
+	return(p);
+	}
+
+ void display(node *p)
+  {
+    	if(p==NULL)	
+	return;
+    	else
+	 if(p->flag==1)
+     	{
+	 printf("(");
+	 display(p->dptr);
+	 printf(")");
+	 if(p->next!=NULL)
+	 display(p->next);
+     	}
+        else
+        {
+	printf("%c",p->c);
+	display(p->next);
+        }
+   }
+
+
+	/*
+
+
+	******************OUTPUT******************
+
+
+	***********GENERALISED LINKED LIST***********
+	1.Create GLL
+	2.Display GLL
+	 Enter your choice:
+	1
+	
+	 Enter GLL:
+	(a,b,c,d)
+	
+	 GLL Created Successfully....
+	Do you want to continue(1/0):1
+	
+	***********GENERALISED LINKED LIST***********
+	1.Create GLL
+	2.Display GLL
+	 Enter your choice:
+	2
+	
+	 GLL is:
+	abcd
+	Do you want to continue(1/0):0	
+
+	
+	*/
+
+
 
 
 
