@@ -7,7 +7,7 @@ employee
 quick sort
 set
 gll
-
+structure
 
 sll
 
@@ -1933,7 +1933,189 @@ typedef struct gllnode
 	*/
 
 
+structure (student)
+	
+	
+	
+	#include<stdio.h>
+#include<string.h>
+struct student
+{
+ int roll_no;
+ char name[20];
+ float p;
+};
 
+ void create(struct student st[10],int n);
+ void display(struct student st[10],int n);
+ int add (struct student st[10],int n);
+ void search(struct student st[10],int n);
+ void modify(struct student st[10],int n);
+ int delete(struct student st[10],int n);
+
+ void main()
+ {
+  struct student st[10];
+   int n,ch;
+        
+  do
+   {
+    printf("\n\n\n*******Student Database*******");
+    printf("\n1.Create Database\n2.Display Database\n3.Add Record\n4.Search Record\n5.Modify Record\n6.Delete Record\n7.Exit");
+    printf("\nEnter ur choice\n");
+    scanf("%d",&ch);
+    switch(ch)
+      {
+       case 1:
+              printf("\nEnter how many students records?\n");
+               scanf("%d",&n);
+               create(st,n);
+               break;
+       case 2:
+              display(st,n);
+               break;
+       case 3:if(add(st,n) ==1)
+               {printf("\n RECORD ADDED SUCCESSFULLY.....");
+               n++;
+               display(st,n);
+              }
+               break;
+       case 4:
+               search(st,n);
+               break;
+       case 5:
+               modify(st,n);
+               display(st,n);
+               break;
+       case 6:
+              if(delete(st,n) ==1)
+              {
+               printf("\nRECORD DELETED SUCCESSFULLY.....");
+                n--;
+               display(st,n);
+              }
+              break;
+          }
+     }while(ch!=7);
+  }
+    
+   // Creates database to students
+    void create(struct student st[10],int n)
+    {
+     int i;  
+     float p1;
+    printf("\n Enter %d students data (roll_no,name,ppercentage)\n",n);
+   for(i=0;i<n;i++)
+     {
+      scanf("%d%s%f",&st[i].roll_no,st[i].name,&p1);
+     st[i].p=p1;
+     }
+     printf("\nDATABASE CREATED SUCCESSFULLY.....");
+    }  
+
+   void display(struct student st[10],int n)
+    {
+     int i;
+     printf("\n\n\n*******DATABASE OF STUDENT*******");
+     printf("\nROLL NO.\tNAME\tPERCENTAGE");
+      for(i=0;i<n;i++)
+      {
+      printf("\n%d\t%s\t%f",st[i].roll_no,st[i].name,st[i].p);
+      }
+     }
+   
+   int add(struct student st[10],int n)
+   {
+     int pos,i,r;
+     float p1;
+     char name[20];
+   
+    printf("\n Enter position to insert\n");
+    scanf("%d",&pos);
+    if(pos<=n+1)
+    {
+     printf("\n Enter student data to add(roll_no,name,percentage)\n");
+    scanf("%d%s%f",&r,name,&p1);
+    for(i=0;i<n;i++)
+     {
+      if(st[i].roll_no==r)
+       {
+        printf("Roll number of student should not be same");
+        return (0);
+       }
+     }
+     for(i=n+1;i>=pos-1;i--)
+      st[i+1]=st[i];
+      st[pos-1].roll_no=r;
+      strcpy(st[pos-1].name,name);
+      st[pos-1].p=p1;
+    }
+   else
+     {
+      printf("\n Enter Proper Position!!!!!\n");
+      return(0);
+     }
+      return(1);
+   }
+ 
+
+  void search(struct student st[10],int n)
+    {
+     int r,i;
+     printf("\n Enter student roll no.to search\n");
+     scanf("%d",&r);
+      for(i=0;i<n;i++)
+     {
+      if(st[i].roll_no==r)
+      {
+       printf("\n RECORD FOUND.....");
+       printf("\n%d\t%s\t%f",st[i].roll_no,st[i].name,st[i].p);
+       return;
+      }
+     }
+   printf("\n RECORD NOT FOUND!!!!!");
+   } 
+
+
+ void modify(struct student st[10],int n)
+  {
+   int r,i;
+   float p1;
+   printf("\nEnter students roll no.to modify record\n");
+   scanf("%d",&r);
+   for(i=0;i<n;i++)
+     {
+      if(st[i].roll_no==r)
+      {
+       printf("\nEnter new name and percentage\n");
+       scanf("%s%f",st[i].name,&p1);
+       st[i].p=p1;
+       printf("\n RECORD MODIFIED SUCCESSFULLY.....");
+      return;
+   }
+   printf("\n RECORD NOT FOUND!!!!!");
+  }
+  }
+ 
+ int delete(struct student st[10],int n)
+ {
+   int r,i,pos;
+   
+   printf("\n Enter student roll no.to delete record\n");
+   scanf("%d",&r);
+   for(i=0;i<n;i++)
+   {
+      if(st[i].roll_no==r)
+      {
+        pos=i;
+        for(i=pos+1;i<n;i++)
+         st[i-1]=st[i];
+         return (1);
+       }
+    }
+  printf("\n RECORD NOT FOUND!!!!!");
+  return (0);
+ }
 
 
 
