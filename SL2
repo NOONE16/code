@@ -1,0 +1,1325 @@
+================================================================== SL2 ===================================================================
+
+Format-
+ 
+1.Shell
+2.Fork
+  A.Sorting1
+  B.Sorting2
+3.Matrix
+4.Producer Consumer
+5.Reader Writer
+6.Dinning Philospher 
+7.Pipes and Fifo
+  A.Pipes
+  B.Fifo
+    B1-Server
+    B2-Client
+8.Shared Memory
+  A.Shm Client
+  B.Shm Server
+9.File Handling
+
+
+*******************************************************************************************************************************************
+
+
+1.shell
+
+
+#!/bin/bash
+
+
+createAddressBook()
+{
+
+	#echo
+	if [ -e $addressbook.txt ]
+       then
+	echo "Address Book already created"
+       else
+	touch addressbook.txt
+          echo "addressbook created"
+
+       fi
+}
+
+
+insertARecord()
+{
+     echo
+     while true
+     do
+
+	echo "to add a record to address book,please enter the information in this"
+	echo "format: \"last name,first name,email,phone number\" (no of quotes or space)."
+	echo "example: verma,rajat,rajatverma@gmail.com,1234567890"
+	echo "to quit press 'q'."
+	read  aInput
+	if [ "$aInput"=='q']
+  	      then
+	      break
+ 	fi 
+    	echo
+ 	echo $aInput>>addressbook.txt
+	echo "The record inserted in address book."
+	echo
+      done
+}
+viewRecord()
+{
+    echo
+    while true
+    do
+	echo "To display a record,enter the last name of the person(case sensitive)."
+	echo "to quit,press 'q'."
+	read dInput
+	if ["$dInput"=='q']
+	     then
+	     break
+	fi	
+	echo
+	echo "Display records for \"$dInput\":"
+	grep ^"$dInput" addressbook.txt     #searching the lines by last name(the first field in the record)
+	RETURNSTATUS=`echo $?`
+	if [ $RETURNSTATUS -eq 1 ]
+	     then
+	     echo "No records found with last name of \"$dInput\"."
+	fi
+ 	echo
+     done
+}
+
+
+modifyRecord()
+{
+    echo
+    while true
+    do
+     	echo "To modify a record,enter any search string,e.g. last name or email address (case sensitive)."
+	echo "When finished editing addess book,enter 'q' to quit."
+	read eInput
+	if [ "$eInput" =='q' ]
+	        then
+	 	break
+	fi
+	echo
+	echo "Listing records for \"$eInput\":"
+	grep -n "$eInput" addressbook.txt
+	RETURNSTATUS=`echo $?`
+	if [ $RETURNSTATUS -eq 1 ]
+	    then
+	    echo "No record found for \"$eInput\""
+	else
+	    echo
+	    echo " Enter the line  number (the fist number of the entery) that you'd like to edit."
+	    read lineNumber
+	    echo
+	    for line in `grep -n "$eInput" addressbook.txt`
+	    do
+		number=`echo "$line" | cut -c1`
+		if [ $number -eq $lineNumber ]
+		then 		
+		echo "what would you like to change it to?Use the format:"
+		echo "\"last name,first name,email url,phone number\"(no quotes or space)."
+		read edit
+		lineChange="${lineNumber}s"
+		sed -i -e "$lineChange/.*/$edit/" addressbook.txt
+		echo
+		echo "address book updated"
+	    fi
+  	done
+    fi
+    echo
+  done
+}
+ 
+
+
+deleteRecord()
+{
+   echo
+   while true
+   do
+ 	echo "To remove a record,enter any research string,e.g.last name or email address(case sensitive)."
+	echo "If finished, enter 'q' to quit."
+	read rInput
+	if [ "$rInput"=='q']
+	      then
+	      break
+	fi
+	echo
+	echo "Listing records for \"$rInput\":"
+	grep -n "$rInput" addressbook.txt
+	RETURNSTATUS=`echo $?`
+	if [ $RETURNSTATUS -eq 1 ]
+	    then
+	    echo "No records found for \"$rInput\""
+	else
+	     echo 
+	     echo "Enter the line number (the first number of the entry) of the record you want to remove."
+	     read lineNumber
+	     for line in `grep -n "$rInput" addressbook.txt`
+	     do
+		  number=`echo "$line" | cut -c1`
+		  if [ $number -eq $lineNumber ]
+ 		  then
+     		  lineRemove="${lineNumber}d"
+		  sed -i -e "$lineRemove" addressbook.txt
+                  echo "The record was removed from the address book."
+	     fi
+         done
+      fi
+      echo
+   done
+}
+
+
+
+searchRecord()
+{
+   echo
+   while true
+   do
+	echo "To search for a record,enter any search string ,e.g. last name or email address (car sensitive)."
+	echo "the format of a record is \"Last name,firstname,email address,phone nember\"."
+	echo "Example : Verma,Rajat,rajatverma@gmail.com,1234567890"
+	echo "for exit,enter 'q'."
+	read sInput
+	if ["$sInput"=='q']
+	   then 
+	   break
+        fi
+	echo
+        echo "Listing records for \"$sInput\":"
+	grep "$sInput" addressbook.txt
+	RETURNSTATUS=`echo $?`
+	if [$RETURNSTATUS -eq 1]
+	    then
+	    echo "No records found for \"$sInput\"."
+        fi
+          echo
+      done
+}
+echo
+lastCharOfFile=`tail -c 1 addressbook.txt` # checking to make sure the .txt file ends with newline character
+if [ -n "$lastCharOfFile" ]
+	then
+	echo >> addressbook.txt
+fi
+echo "address book?"
+echo "enter your choice"
+echo "1-->create  address book"
+echo "2-->insert a record"
+echo "3-->view one or more records"
+echo "4-->modify a record"
+echo "5-->delete a single record"
+echo "6-->search for records"
+echo "7-->exit"
+echo
+read input
+case $input in 
+	1) createAddressBook;;
+	2) insertARecord;;
+	3) viewRecord;;
+	4) modifyRecord;;
+	5) deleteRecord;;
+	6) searchRecord;;
+	7) exit;;
+esac
+
+
+
+echo
+
+#run command:sh book1.sh
+
+
+
+*******************************************************************************************************************************************
+
+
+2.Fork system call
+
+
+A.Sorting1
+
+
+#include<unistd.h>
+#include<sys/types.h>
+#include<stdio.h>
+void asc(int*,int sz);
+void asc(int*,int sz);
+int main()
+{
+pid_t pid;
+int *a,sz,i;
+printf("enter the size of the array\n");
+scanf("%d",&sz);
+a=(int*)malloc(sz*sizeof(int));
+printf("enter element of %d size array\n",sz);
+for(i=0;i<sz;i++)
+{
+printf("a[%d]:",i);
+scanf("%d",&a[i]);
+}
+pid=fork();
+    switch(pid)
+    {
+    case 1:
+    printf("error in fork\n");
+    exit(1);
+    case 0:
+    printf("child process\n");
+    asc(a,sz);
+    exit(0);
+    default:
+    wait(NULL);
+    printf("parent process\n");
+    dsc(a,sz);
+    exit(0);
+    }
+return(0);
+}
+void asc(int *a,int sz)
+{
+int i,j,temp;
+for(i=0;i<sz;i++)
+  {
+   for(j=i+1;j<sz;j++)
+     {
+       if(a[i]>a[j])
+       {
+       temp=a[i];
+       a[i]=a[j];
+       a[j]=temp;
+       }
+     }
+}
+printf("sorted array elements in ascending order\n");
+for(i=0;i<sz;i++)
+   {
+    printf("%d\t",a[i]);
+   }
+printf("\n");
+}
+
+void dsc(int *a,int sz)
+{
+ int i,j,temp;
+ for(i=0;i<sz;i++)
+     {
+      for(j=i+1;j<sz;j++)
+        {
+          if(a[i]<a[j])
+          {
+           temp=a[i];
+           a[i]=a[j];
+           a[j]=temp;
+          }
+        }
+}
+printf("sorted array elements in descending order are\n");
+for(i=0;i<sz;i++)
+    {
+     printf("%d\t",a[i]);
+    }
+}
+
+
+
+
+/*=======================output=======================
+enter the size of the array
+4
+enter element of 4 size array
+a[0]:10
+a[1]:20
+a[2]:30
+a[3]:40
+child process
+sorted array elements in ascending order
+10	20	30	40	
+parent process
+sorted array elements in descending order are
+40	30	20	10	*/
+
+
+
+B.Sorting2
+
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+int main(int argc,char *argv[],char *en[])
+{
+  	int i,j,c,arr[argc],ele;
+	
+	for(j=0;j<argc-1;j++)
+	{
+		int n=atoi(argv[j]);
+		arr[j]=n;
+	}
+	
+	ele=atoi(argv[j]);
+	i=0;j=argc-1;
+	c=(i+j)/2;
+	while(arr[c]!=ele && i<=j)
+	{
+		if(ele>arr[c])
+		i=c+1;
+		else
+		j=c-1;
+		c=(i+j)/2;
+	}
+	if(i<=j)
+	printf("\n Element found in given array");
+	else
+	printf("\n Elements not found in given array");
+	return 0;
+}
+
+/*
+[kiosk@foundation5 ~]$ gcc s2a.c -o first
+[kiosk@foundation5 ~]$ gcc s2b.c -o second
+[kiosk@foundation5 ~]$ ./first ./second
+
+ Enter the size of array
+6
+
+ Enter the numbers
+6
+8
+4
+9
+6
+0
+
+ Elements entered are
+684960
+ Sorted elements are
+:046689
+ Enter element to search:6
+
+ Element found in given array[kiosk@foundation5 ~]$ 
+*/
+
+
+
+*******************************************************************************************************************************************
+
+
+3.Matrix
+
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<pthread.h>
+#include<errno.h>
+
+struct m
+{
+	int a,b;
+}typedef data;
+
+void *mat_mul(void *arg)
+{
+	data *m;
+	int temp;
+	int *ptr = (int *)malloc(sizeof(int));	
+	m = (data *) arg;
+	temp = ((m->a) * (m->b));
+	
+	ptr = &temp;
+	printf("\n\n\t a = %d  X  b = %d is %d ",(m->a),(m->b),*ptr);	
+	pthread_exit((void*)temp);
+}
+
+int main()
+{
+	//void *i, *j, *k; 
+	int sum, a,b,c;
+	pthread_t pt1;
+	pthread_t pt2;
+	pthread_t pt3;
+	data *d1=(data *)malloc(sizeof(data));
+	data *d2=(data *)malloc(sizeof(data));
+	data *d3=(data *)malloc(sizeof(data));
+	int mat1[3] = {1,2,3}, mat2[3][1]={{1},{2},{3}};
+	
+	//assigning values from matrix to structure
+	d1->a = mat1[0]; d1->b = mat2[0][0];
+	d2->a = mat1[1]; d2->b = mat2[0][1];
+	d3->a = mat1[2]; d3->b = mat2[0][2];
+	//let us create three threads
+	pthread_create(&pt1, NULL, mat_mul, (void *)d1);
+	pthread_create(&pt2, NULL, mat_mul, (void *)d2);
+	pthread_create(&pt3, NULL, mat_mul, (void *)d3);
+	//wait for the threads to finish
+	pthread_join(pt1,(void**)&a);
+	pthread_join(pt2,(void**)&b);
+	pthread_join(pt3,(void**)&c);
+	
+	sum = a + b + c;
+	
+	printf("\nThe value of the 1X3 and 3X1 matrix multiplication is : %d\n",sum);
+	return 0;
+}
+/*************output************************
+amrut@amrut-HP-ProDesk-400-G1-SFF:~$ gcc -pthread matrix.c
+amrut@amrut-HP-ProDesk-400-G1-SFF:~$ ./a.out
+
+
+	 a = 1  X  b = 1 is 1 
+
+	 a = 2  X  b = 2 is 4 
+
+	 a = 3  X  b = 3 is 9 
+The value of the 1X3 and 3X1 matrix multiplication is : 14
+amrut@amrut-HP-ProDesk-400-G1-SFF:~$*/
+
+
+*******************************************************************************************************************************************
+
+
+4.Producer Consumer
+
+
+#include<stdio.h>
+#include<semaphore.h>
+#include<sys/types.h>
+#include<pthread.h>
+#include<unistd.h>
+#include<stdlib.h>
+
+#define BUFFER_SIZE 10
+
+pthread_mutex_t mutex;
+sem_t empty,full;
+
+int buffer[BUFFER_SIZE];
+int counter;
+
+pthread_t tid;
+
+void *producer();
+void *consumer();
+
+void insert_item(int);
+int remove_item();
+
+void initilize()
+{
+ pthread_mutex_init(&mutex,NULL);
+ sem_init(&full,0,0);
+ sem_init(&empty,0,BUFFER_SIZE);
+}
+
+
+void *producer()
+{
+ int item,wait_time;
+ wait_time=rand()%5;
+ sleep(wait_time)%5;
+ item=rand()%10;
+ sem_wait(&empty);
+ pthread_mutex_lock(&mutex);
+ printf("Producer produce %d\n\n",item);
+ insert_item(item);
+ pthread_mutex_unlock(&mutex);
+ sem_post(&full);
+}
+
+void *consumer()
+{
+ int item,wait_time;
+ wait_time=rand()%5;
+ sleep(wait_time);
+ sem_wait(&full);
+ pthread_mutex_lock(&mutex);
+ item=remove_item();
+ printf("Consumer consume %d\n\n",item);
+ pthread_mutex_unlock(&mutex);
+ sem_post(&empty);
+}
+
+
+void insert_item(int item)
+{
+ buffer[counter++]=item;
+}
+
+int remove_item()
+{
+ return buffer[--counter];
+}
+
+int main()
+{
+ int n1,n2;
+ int i;
+ printf("Enter number of Producers");
+ scanf("%d",&n1);
+ printf("Enter number of Consumers");
+ scanf("%d",&n2);
+ initilize();
+ for(i=0;i<n1;i++)
+  pthread_create(&tid,NULL,producer,NULL);
+ for(i=0;i<n2;i++)
+  pthread_create(&tid,NULL,consumer,NULL);
+ sleep(5);
+ exit(0);
+}
+/*--------------output-------------
+
+avcoe@avcoe-HP-ProDesk-400-G1-SFF:~$ ./a.out
+Enter number of Producers4
+Enter number of Consumers4
+Producer produce 3
+
+Consumer consume 3
+
+Producer produce 1
+
+Consumer consume 1
+
+Producer produce 2
+
+Consumer consume 2
+
+Producer produce 7
+
+Consumer consume 7*/
+
+
+*******************************************************************************************************************************************
+
+
+5.Reader writer
+
+
+//****Reader-Writer problem with reader priority.***
+#include<pthread.h>
+//#include<semaphore.h>
+#include<stdlib.h>
+#include<stdio.h>
+pthread_mutex_t x, wsem;// x is for reader count, wsem is formutual exclusion
+pthread_t tid;
+int readcount;
+void initialize()
+{
+pthread_mutex_init(&x,NULL);
+pthread_mutex_init(&wsem,NULL);
+readcount=0;
+}
+void * reader(void * param)
+{
+int waittime;
+waittime=rand()%5;
+printf("\n reader is trying to enter");
+pthread_mutex_lock(&x);
+readcount++;
+if(readcount==1)
+pthread_mutex_lock(&wsem);
+printf("\n %d reader is inside",readcount);
+pthread_mutex_unlock(&x);
+sleep(waittime);
+pthread_mutex_lock(&x);
+readcount--;
+if(readcount==0)
+pthread_mutex_unlock(&wsem);
+pthread_mutex_unlock(&x);
+printf("\n reader is leaving ");
+}
+void *writer(void * param)
+{
+int waittime;
+waittime=rand()%3;
+printf("\n writer is trying to enter");
+pthread_mutex_lock(&wsem);
+printf("\n writer has entered");
+sleep(waittime);
+pthread_mutex_unlock(&wsem);
+printf("\n writer is leaving ");
+sleep(30);
+exit(0);
+}
+int main()
+{
+int n1,n2,i;
+printf("\n enter the number of readers:");
+scanf("%d",&n1);
+printf("\n enter the number of writers:");
+scanf("%d",&n2);
+for(i=0;i<n1;i++)
+pthread_create(&tid,NULL,reader,NULL);
+for(i=0;i<n1;i++)
+pthread_create(&tid,NULL,writer,NULL);
+sleep(30);
+exit(0);
+}
+/******************output**************
+amrut@amrut-HP-ProDesk-400-G1-SFF:~$ gcc rw.c -lpthread
+amrut@amrut-HP-ProDesk-400-G1-SFF:~$ ./a.out
+
+ enter the number of readers:2
+
+ enter the number of writers:5
+
+ reader is trying to enter
+ 1 reader is inside
+ reader is trying to enter
+ 2 reader is inside
+ writer is trying to enter
+ writer is trying to enter
+ reader is leaving 
+ reader is leaving 
+ writer has entered
+ writer is leaving 
+ writer has entered
+ writer is leaving amrut@amrut-HP-ProDesk-400-G1-SFF:~$ */
+
+
+
+
+*******************************************************************************************************************************************
+
+
+6.Dining Philosopher
+
+
+﻿#include<stdio.h>
+#include<semaphore.h>
+#include<pthread.h>
+  
+#define N 5
+#define THINKING 0
+#define HUNGRY 1
+#define EATING 2
+#define RIGHT (ph_num+4)%N
+#define LEFT (ph_num+1)%N
+  
+sem_t mutex;
+sem_t S[N];
+  
+void * philospher(void *num);
+void take_fork(int);
+void put_fork(int);
+void test(int);
+  
+int state[N];
+int phil_num[N]={0,1,2,3,4};
+  
+int main()
+{
+    int i;
+    pthread_t thread_id[N];
+    sem_init(&mutex,0,1);
+    for(i=0;i<N;i++)
+        sem_init(&S[i],0,0);
+    for(i=0;i<N;i++)
+    {
+        pthread_create(&thread_id[i],NULL,philospher,&phil_num[i]);
+        printf("Philosopher %d is thinking\n",i+1);
+    }
+    for(i=0;i<N;i++)
+        pthread_join(thread_id[i],NULL);
+}
+  
+void *philospher(void *num)
+{
+  int l=0;
+    while(l<2)
+    {
+        l++;
+        int *i = num;
+        sleep(1);
+        take_fork(*i);
+        sleep(0);
+        put_fork(*i);
+    }
+}
+  
+void take_fork(int ph_num)
+{
+    sem_wait(&mutex);
+    state[ph_num] = HUNGRY;
+    printf("Philosopher %d is Hungry\n",ph_num+1);
+    test(ph_num);
+    sem_post(&mutex);
+    sem_wait(&S[ph_num]);
+    sleep(1);
+}
+  
+void test(int ph_num)
+{
+    if (state[ph_num] == HUNGRY && state[LEFT] != EATING && state[RIGHT] != EATING)
+    {
+        state[ph_num] = EATING;
+        printf("Philosopher %d takes fork %d and %d\n",ph_num+1,LEFT+1,ph_num+1);
+        printf("Philosopher %d is Eating\n",ph_num+1);
+        sem_post(&S[ph_num]);
+    }
+}
+  
+void put_fork(int ph_num)
+{
+    sem_wait(&mutex);
+    state[ph_num] = THINKING;
+    printf("Philosopher %d putting fork %d and %d down\n",ph_num+1,LEFT+1,ph_num+1);
+    printf("Philosopher %d is thinking\n",ph_num+1);
+    test(LEFT);
+    test(RIGHT);
+    sem_post(&mutex);
+}
+/*********************OUTPUT******************************
+amrut@amrut-HP-ProDesk-400-G1-SFF:~$ gcc dp.c -lpthread
+amrut@amrut-HP-ProDesk-400-G1-SFF:~$ ./a.out
+Philosopher 1 is thinking
+Philosopher 2 is thinking
+Philosopher 3 is thinking
+Philosopher 4 is thinking
+Philosopher 5 is thinking
+Philosopher 1 is Hungry
+Philosopher 1 takes fork 2 and 1
+Philosopher 1 is Eating
+Philosopher 5 is Hungry
+Philosopher 4 is Hungry
+Philosopher 4 takes fork 5 and 4
+Philosopher 4 is Eating
+Philosopher 3 is Hungry
+Philosopher 2 is Hungry
+Philosopher 1 putting fork 2 and 1 down
+Philosopher 1 is thinking
+Philosopher 2 takes fork 3 and 2
+Philosopher 2 is Eating
+Philosopher 4 putting fork 5 and 4 down
+Philosopher 4 is thinking
+Philosopher 5 takes fork 1 and 5
+Philosopher 5 is Eating
+Philosopher 1 is Hungry
+Philosopher 2 putting fork 3 and 2 down
+Philosopher 2 is thinking
+Philosopher 3 takes fork 4 and 3
+Philosopher 3 is Eating
+Philosopher 4 is Hungry
+Philosopher 5 putting fork 1 and 5 down
+Philosopher 5 is thinking
+Philosopher 1 takes fork 2 and 1
+Philosopher 1 is Eating
+Philosopher 2 is Hungry
+Philosopher 3 putting fork 4 and 3 down
+Philosopher 3 is thinking
+Philosopher 4 takes fork 5 and 4
+Philosopher 4 is Eating
+Philosopher 5 is Hungry
+Philosopher 1 putting fork 2 and 1 down
+Philosopher 1 is thinking
+Philosopher 2 takes fork 3 and 2
+Philosopher 2 is Eating
+Philosopher 3 is Hungry
+Philosopher 4 putting fork 5 and 4 down
+Philosopher 4 is thinking
+Philosopher 5 takes fork 1 and 5
+Philosopher 5 is Eating
+Philosopher 2 putting fork 3 and 2 down
+Philosopher 2 is thinking
+Philosopher 3 takes fork 4 and 3
+Philosopher 3 is Eating
+Philosopher 3 putting fork 4 and 3 down
+Philosopher 3 is thinking
+Philosopher 5 putting fork 1 and 5 down
+Philosopher 5 is thinking */
+
+
+
+*******************************************************************************************************************************************
+
+
+7.Pipes and Fifo
+
+
+A.Pipes
+
+
+/*================================================================================================
+In this program the PARENT process send the filename to the CHILD  - which reads the file contents
+and put it on a second pipe which is read by the PARENT, which inturn displays the content written
+by CHILD to PARENT
+==================================================================================================*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include<wait.h>
+
+int main(void)
+{
+        pid_t pid;
+        int i,r;
+        char buf[1024],disp[6000];
+        char cp[10],fname[1024];
+        char ans;
+        int readpipe[2]; // create read pipe (un-named pipe)
+        int writepipe[2];//create write pipe (un-named pipe)
+        long int a;
+        int b;
+	a=pipe(readpipe);
+        b=pipe(writepipe);
+ 
+        if (a == -1) { perror("pipe"); exit(EXIT_FAILURE); }
+        if (b == -1) { perror("pipe"); exit(EXIT_FAILURE); }
+        //printf("\nSIZE OF CP IS %d",sizeof(cp));
+        printf("\nPRESS Y TO SEND SOMETHING TO CHILD PROCESS\t");
+        scanf("%[^\n]%*c",&ans);
+        fflush(stdin);
+        pid=fork();
+
+        if(pid==-1)
+        {
+                printf("pid:main");
+                exit(1);
+        }
+
+        while(ans=='y' || ans=='Y')
+        {
+                if(pid==0)
+                { 
+                	close(readpipe[1]);//CHILD PROCESS reads from readpipe[0] so closes [1]
+                        close(writepipe[0]); //CHILD PROCESS writes to writepipe[1] so closes[0]
+                        if(read(readpipe[0],buf,sizeof(buf)) < 0)//the file name send from PARENT is read by CHILD
+                        {
+                            break;
+                        }
+                        printf("\nFILE name send to Child Process: %s\n",buf); //CHILD displays the file name
+                        printf("\n(child)Writing File contents on to pipe:\t");
+			char temp[1024];
+			int j = 0;
+
+			for(;buf[j]!='\0';j++)
+			{
+				temp[j] = buf[j]; //removes the null charecter from the filename
+			}
+
+			///file program starts///
+				FILE *fp;
+				/* opening file for reading */
+				fp = fopen(temp , "r");
+				if(fp == NULL)
+				{
+					perror("Error opening file");
+					return(-1);
+				}
+				while(!feof(fp))
+				{
+					if( fgets(cp, 10, fp)!=NULL ) //reading file content untill EOF
+					{
+						strcat(disp,cp);	
+					}
+				}
+				fclose(fp);//CHILD closes the opend file
+			////End file program////
+			fflush(stdin); //flushes the input buffer 
+                        printf("\nData is being Written to SECOND pipe by CHILD so that PARENT can read it ");
+			
+			
+                        if(write(writepipe[1],disp,strlen(disp)+1) < 0)//writting the data into second pipe.
+                        {
+                            break;
+                        }             
+			fflush(stdout);//clearing output buffer.
+			disp[0] = 0;	//resetting the array for next file-read	         
+                }
+                else
+                {
+                        close(readpipe[0]);//the PARENT reads from readpipe[1] so closes the[0]
+                        close(writepipe[1]);//the PARENT writes to writepipe[0] so closes the[1]
+                        printf("\n(Parent)Enter FILE NAME: \t");
+                        scanf("%s", fname);
+                        printf("\nSending FILE-NAME to Child: %s",fname);
+                        if(write(readpipe[1],fname,strlen(fname)+1) < 0)
+                        {
+                            break;
+                        }         
+                        if(read(writepipe[0],buf,sizeof(buf)) < 0)
+                        {
+                            break;
+                        }
+			else{
+				puts(disp);//printing in console what ever file contents we get from child.
+			}
+                        printf("\nParent Process Read: %s\n",buf);
+                        printf("\nPress Y TO SEND SOMETHING TO CHILD PROCESS OR ELSE PRESS N\t");
+                        fflush(stdin);
+                        scanf(" %[^\n]%*c",&ans);
+			fflush(stdin);
+			
+			//fflush(stdout);
+                        if(ans=='n')
+                        {
+                                kill(pid,SIGKILL);
+                        }
+                }
+        }
+ 	//closing the read and write pipes
+	close(readpipe[1]);
+        close(writepipe[0]);
+        close(readpipe[0]);
+        close(writepipe[1]);
+        
+	return 0;
+}
+
+
+
+B.Fifo
+
+B.1-Server
+
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<sys/types.h>
+#include<sys/types.h>
+#include<fcntl.h>
+#include<string.h>
+
+int main()
+{
+	int n;
+	puts("Server");
+	char strMessage[5000];//[] = {"welcome", "to", "the", "module.", "This", "will", "now", "stop"};
+	int fd = open("fifo6.txt", O_WRONLY);
+	int fd2 = open ("fifo7.txt", O_RDONLY);
+	if(fd == -1)
+	{
+		perror("cannot open fifo6");
+		return EXIT_FAILURE;
+	}
+	if(fd2 == -1)
+	{
+		perror("cannot open fifo7");
+		return EXIT_FAILURE;
+	}
+	puts("FIFO OPEN");
+	//read string up to(5000 characters)
+	char stringBuffer[5000];
+	memset(stringBuffer, 0, 5000);
+	int res;
+	char Len;
+	//while(1)
+	{
+		printf("\n\n\t\tEnter the Message to be passed (hitting ENTER without any string will terminate program): ");
+		fgets(strMessage, 100, stdin);
+		char L = (char) strlen(strMessage);
+		//printf("\n\tLength of the given string: %d\n", (L-1));
+		
+		write(fd, &L, 1);
+		write(fd, strMessage, strlen(strMessage));
+		fflush(stdin);
+		strMessage[0] = 0;//reseting the character array
+		//if(L==1)//since null counts 1
+			//break;	
+		int len2;
+		res = read(fd2, &len2, 1);
+		//if(len2 == 1)//since null counts 1
+			//break;
+		
+		read(fd2, stringBuffer, 5000); //Read String Characters
+				
+		printf("\nServer Received: %s\n", stringBuffer);
+		stringBuffer[(int)len2] = 0;
+	};	
+	//printf("\n\nCLIENT CLOSED\n")
+	//return 0;
+}
+
+
+
+
+B.2-Client
+
+
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<sys/types.h>
+#include<sys/stat.h>
+#include<unistd.h>
+#include<fcntl.h>
+#include<string.h>
+
+int main()
+{
+	puts("\n\tClient - Listening\n");
+	int code6 = mkfifo("fifo6.txt",0666);
+	int code7 = mkfifo("fifo7.txt",0666);
+	char strMessage[5000];	
+	if(code6 == -1)
+		perror("\n\tmkfifo6 returned an error-file any already exist\n");
+	if(code7 == -1)
+		perror("\n\tmkfifo7 returned an error-file any already exist\n");
+
+	int fd = open("fifo6.txt", O_RDONLY);
+	int fd2 = open("fifo7.txt", O_WRONLY);
+	if(fd == -1)
+	{
+		perror("Cannot open FIFO6 for read");
+		return EXIT_FAILURE;
+	}
+	if(fd2 == -1)
+	{
+		perror("Cannot open FIFO7 for write");
+		return EXIT_FAILURE;
+	}
+	puts("FIFO OPEN");
+	//read string up to(5000 characters)
+	char stringBuffer[5000];
+	memset(stringBuffer, 0, 5000);
+	
+	int res;
+	char Len;
+	//while(1)
+	{
+		res = read(fd, &Len, 1);
+		//if(Len == 1)//since null counts 1
+			//break;
+		
+		read(fd, stringBuffer, Len); //Read String Characters
+		stringBuffer[(int)Len] = 0;
+		printf("\nClient Received: %s\n", stringBuffer);
+		int j = 0,w=0, line = 0;
+		while(stringBuffer[j]!='\0'){
+			char ch = stringBuffer[j];		
+			if((ch==' ')||(ch=='\n')){
+				w++;
+				if(ch=='\n')
+					line++;
+			}
+			j++;			
+		}
+		char LC = (char) strlen(strMessage);
+		char str1[256];
+		char str2[256];
+		char str3[256];
+		sprintf(str1," No.of Words : %d:::", w); strcat(strMessage,str1); 
+		sprintf(str2," No.of Charecters: %d:::",(j-1)); strcat(strMessage,str2);
+		sprintf(str3," No.of Lines: %d",line); strcat(strMessage,str3);
+		strcat(strMessage,"\0");
+			printf("\n\tString: %s",strMessage);
+		write(fd2, &LC, 1);
+		write(fd2, strMessage, strlen(strMessage));
+		fflush(stdin);
+		strMessage[0] = 0;//reseting the character array
+		//if(LC==1)
+			//break;
+						
+	}
+	printf("\n");
+	puts("CLIENT CLOSED");
+	puts("SERVER CLOSED");
+	close(fd);
+	close(fd2);
+	return 0;
+}
+
+
+
+*******************************************************************************************************************************************
+
+
+8.Shared memory
+
+
+A.Shm client
+
+/*
+ * shm-client - client program to demonstrate shared memory.
+ */
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <stdio.h>
+
+#define SHMSZ     27
+
+main()
+{
+    int shmid;
+    key_t key;
+    char *shm, *s;
+
+    /*
+     * We need to get the segment named
+     * "5678", created by the server.
+     */
+    key = 5678;
+
+    /*
+     * Locate the segment.
+     */
+    if ((shmid = shmget(key, SHMSZ, 0666)) < 0) {
+        perror("shmget");
+        exit(1);
+    }
+
+    /*
+     * Now we attach the segment to our data space.
+     */
+    if ((shm = shmat(shmid, NULL, 0)) == (char *) -1) {
+        perror("shmat");
+        exit(1);
+    }
+
+    /*
+     * Now read what the server put in the memory.
+     */
+    for (s = shm; *s != NULL; s++)
+        putchar(*s);
+    putchar('\n');
+
+    /*
+     * Finally, change the first character of the 
+     * segment to '*', indicating we have read 
+     * the segment.
+     */
+    *shm = '*';
+
+    exit(0);
+}
+
+
+B.Shm server
+
+
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <stdio.h>
+
+#define SHMSZ     27
+
+main()
+{
+    char c;
+    int shmid;
+    key_t key;
+    char *shm, *s;
+
+    /*
+     * We'll name our shared memory segment
+     * "5678".
+     */
+    key = 5678;
+
+    /*
+     * Create the segment.
+     */
+    if ((shmid = shmget(key, SHMSZ, IPC_CREAT | 0666)) < 0) {
+        perror("shmget");
+        exit(1);
+    }
+
+    /*
+     * Now we attach the segment to our data space.
+     */
+    if ((shm = shmat(shmid, NULL, 0)) == (char *) -1) {
+        perror("shmat");
+        exit(1);
+    }
+
+    /*
+     * Now put some things into the memory for the
+     * other process to read.
+     */
+    s = shm;
+
+    for (c = 'a'; c <= 'z'; c++)
+        *s++ = c;
+    *s = NULL;
+
+    /*
+     * Finally, we wait until the other process 
+     * changes the first character of our memory
+     * to '*', indicating that it has read what 
+     * we put there.
+     */
+    while (*shm != '*')
+        sleep(1);
+
+    exit(0);
+}
+
+/*########output##############
+avcoe@avcoe-HP-Pro-3330-MT:~$ gcc shm_server.c -o first
+avcoe@avcoe-HP-Pro-3330-MT:~$ gcc shm_client.c -o second
+avcoe@avcoe-HP-Pro-3330-MT:~$ ./first ./second
+abcdefghijklmnopqrstuvwxyz*/
+
+
+
+
+*******************************************************************************************************************************************
+
+
+9.File handling 
+
+
+ #include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <unistd.h>
+ 
+#define BUF_SIZE 8192
+ 
+int main(int argc, char* argv[]) {
+ 
+    int input_fd, output_fd;    /* Input and output file descriptors */
+    ssize_t ret_in, ret_out;    /* Number of bytes returned by read() and write() */
+    char buffer[BUF_SIZE];      /* Character buffer */
+ 
+    /* Are src and dest file name arguments missing */
+    if(argc != 3){
+        printf ("Usage: cp file1 file2");
+        return 1;
+    }
+ 
+    /* Create input file descriptor */
+    input_fd = open (argv [1], O_RDONLY);
+    if (input_fd == -1) {
+            perror ("open");
+            return 2;
+    }
+ 
+    /* Create output file descriptor */
+    output_fd = open(argv[2], O_WRONLY | O_CREAT, 0644);
+    if(output_fd == -1){
+        perror("open");
+        return 3;
+    }
+ 
+    /* Copy process */
+    while((ret_in = read (input_fd, &buffer, BUF_SIZE)) > 0){
+            ret_out = write (output_fd, &buffer, (ssize_t) ret_in);
+            if(ret_out != ret_in){
+                /* Write error */
+                perror("write");
+                return 4;
+            }
+    }
+ 
+    /* Close file descriptors */
+    close (input_fd);
+    close (output_fd);
+ 
+    return (EXIT_SUCCESS);
+}
+
+
+
+
+*******************************************************************************************************************************************
